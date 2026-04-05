@@ -250,7 +250,7 @@ const Dashboard = () => {
   );
 };
 
-// QuickBtn styles updated for better contrast on gradient
+
 const QuickBtn = ({ Icon, label }) => (
   <button className="w-full bg-white/10 hover:bg-white text-white hover:text-blue-900 border border-white/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl flex items-center gap-2 sm:gap-4 transition-all duration-300 group shadow-lg">
     <div className="bg-white/20 group-hover:bg-blue-100 p-2 rounded-lg transition-colors">
@@ -258,8 +258,7 @@ const QuickBtn = ({ Icon, label }) => (
         size={16}
         className="group-hover:scale-110 transition-transform sm:w-4.5 sm:h-4.5 shrink-0"
         style={{ color: "white" }}
-        // we use a class for hover color change if needed,
-        // but keeping it simple for now
+        
       />
     </div>
     <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wide sm:tracking-widest">
