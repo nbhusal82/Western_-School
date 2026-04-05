@@ -6,7 +6,7 @@ export const Adminlayout = () => {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col transition-all duration-300 lg:ml-52">
+      <div className="flex-1 flex flex-col transition-all duration-300 lg:ml-60">
         {/* Mobile header spacer */}
         <div className="h-14 lg:hidden" />
 

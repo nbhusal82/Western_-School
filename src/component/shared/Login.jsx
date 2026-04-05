@@ -51,14 +51,18 @@ const AdminLogin = () => {
       />
 
       {/* Blur + dark overlay */}
+      {/* Blur + dark overlay */}
+      {/* Blur + dark overlay */}
       <div
         className="absolute inset-0"
         style={{
           zIndex: 1,
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
+          // Blur lai 4px bata 1px ma jhareko (wa purai hatauna 'none' rakhnu)
+          backdropFilter: "blur(1px)",
+          WebkitBackdropFilter: "blur(1px)",
+          // Darkness lai 0.72 bata 0.45 ma jhareko jasle image bright dekhinchha
           background:
-            "linear-gradient(135deg, rgba(10,20,40,0.72) 0%, rgba(0,50,100,0.60) 100%)",
+            "linear-gradient(135deg, rgba(10,20,40,0.45) 0%, rgba(0,50,100,0.35) 100%)",
         }}
       />
 

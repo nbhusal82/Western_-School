@@ -29,18 +29,33 @@ const Sidebar = () => {
     { id: "gallery", label: "Gallery", path: "/admin/gallery", icon: Image },
     { id: "notice", label: "Notice", path: "/admin/notice", icon: Bell },
     { id: "blog", label: "Blog", path: "/admin/blog", icon: BookOpen },
-    { id: "vacancy", label: "Vacancy", path: "/admin/vacancy", icon: Briefcase },
+    {
+      id: "vacancy",
+      label: "Vacancy",
+      path: "/admin/vacancy",
+      icon: Briefcase,
+    },
     { id: "event", label: "Event", path: "/admin/event", icon: Calendar },
-    { id: "question", label: "Question Bank", path: "/admin/question-bank", icon: HelpCircle },
+    {
+      id: "question",
+      label: "Question Bank",
+      path: "/admin/question-bank",
+      icon: HelpCircle,
+    },
     { id: "faq", label: "FAQs", path: "/admin/faqs", icon: BookOpen },
-    { id: "achievement", label: "Achievement", path: "/admin/achievement", icon: Award },
+    {
+      id: "achievement",
+      label: "Achievement",
+      path: "/admin/achievement",
+      icon: Award,
+    },
   ];
 
   return (
     <>
       {/* Mobile Header */}
       <div
-        className="lg:hidden text-white p-3 flex justify-between items-center fixed top-0 w-full z-50 shadow-md"
+        className="lg:hidden text-white p-3 flex justify-between items-center fixed top-0 w-full z-50 shadow-md "
         style={{ backgroundColor: "var(--color-secondary)" }}
       >
         <div className="flex items-center gap-2">
@@ -50,7 +65,10 @@ const Sidebar = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="p-1 rounded-md"
-          style={{ backgroundColor: "color-mix(in srgb, var(--color-secondary) 70%, black)" }}
+          style={{
+            backgroundColor:
+              "color-mix(in srgb, var(--color-secondary) 70%, black)",
+          }}
         >
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -65,14 +83,26 @@ const Sidebar = () => {
 
       {/* Sidebar Drawer */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-52 text-white shadow-xl z-50 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
-        style={{ backgroundColor: "#1a1030" }}
+        className={`fixed left-0 top-0 h-screen w-60 text-white shadow-2xl z-50 transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0`}
+        style={{
+          background:
+            "linear-gradient(135deg, var(--color-secondary), var(--color-primary))",
+        }}
       >
         <div
           className="flex items-center gap-3 p-4 border-b"
-          style={{ borderColor: "color-mix(in srgb, var(--color-secondary) 50%, transparent)" }}
+          style={{
+            borderColor:
+              "color-mix(in srgb, var(--color-secondary) 50%, transparent)",
+          }}
         >
-          <img src={logo} alt="Logo" className="w-10 h-10 rounded-full ring-2 ring-white/50" />
+          <img
+            src={logo}
+            alt="Logo"
+            className="w-10 h-10 rounded-full ring-2 ring-white/50"
+          />
           <h1 className="text-lg font-bold leading-tight">{site.name}</h1>
         </div>
 
@@ -89,14 +119,21 @@ const Sidebar = () => {
                 className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all"
                 style={
                   isActive
-                    ? { backgroundColor: "var(--color-primary)", color: "#fff", fontWeight: 600 }
+                    ? {
+                        backgroundColor: "var(--color-primary)",
+                        color: "#fff",
+                        fontWeight: 600,
+                      }
                     : { color: "rgba(255,255,255,0.8)" }
                 }
                 onMouseEnter={(e) => {
-                  if (!isActive) e.currentTarget.style.backgroundColor = "color-mix(in srgb, var(--color-secondary) 40%, transparent)";
+                  if (!isActive)
+                    e.currentTarget.style.backgroundColor =
+                      "color-mix(in srgb, var(--color-secondary) 40%, transparent)";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive) e.currentTarget.style.backgroundColor = "transparent";
+                  if (!isActive)
+                    e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
                 <Icon size={20} />
