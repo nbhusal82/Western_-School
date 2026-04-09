@@ -138,7 +138,6 @@ const Review = () => {
         <AddButton onClick={openAddModal} label="Add Review" />
       </PageHeader>
 
-      {/* DESKTOP TABLE */}
       <div className="hidden lg:block">
         <Table
           columns={columns}
@@ -152,22 +151,21 @@ const Review = () => {
         />
       </div>
 
-      {/* MOBILE CARDS */}
       <div className="lg:hidden space-y-3">
-        {reviews.map((review, index) => (
-          <div key={review.id} className="bg-white rounded-xl shadow-sm border p-4">
-            <div className="flex justify-between items-start gap-2">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <img src={`${imgurl}/${review.image}`} className="w-10 h-10 rounded-full object-cover border shrink-0" alt={review.name} />
+        {reviews.map((row, index) => (
+          <div key={row.id} className="bg-white rounded-xl shadow-sm border p-4">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-3 flex-1">
+                <img src={`${imgurl}/${row.image}`} className="w-12 h-12 rounded-full object-cover border shrink-0" alt={row.name} />
                 <div className="min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{review.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{review.position}</p>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{review.review_text}</p>
+                  <p className="font-medium text-gray-800">{row.name}</p>
+                  <p className="text-xs text-gray-500">{row.position}</p>
+                  <p className="text-xs text-gray-400 mt-1 line-clamp-2">{row.review_text}</p>
                 </div>
               </div>
               <ActionButtons
-                onEdit={() => handleEdit(review)}
-                onDelete={() => handleDeleteClick(review.id)}
+                onEdit={() => handleEdit(row)}
+                onDelete={() => handleDeleteClick(row.id)}
               />
             </div>
           </div>
@@ -231,7 +229,7 @@ const Review = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editingReview ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingReview ? "Update" : "Save"}
             </Button>
           </div>
         </form>

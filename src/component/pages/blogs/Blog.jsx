@@ -6,7 +6,6 @@ import Button, { ActionButtons, AddButton } from "../../shared/Button";
 import Table from "../../shared/Table";
 import ConfirmDialog from "../../shared/ConfirmDialog";
 import { FormInput, FormSelect, FormImageUpload } from "../../shared/FormInput";
-import RichTextEditor from "../../shared/Description";
 
 import {
   useDelete_blogsMutation,
@@ -17,6 +16,8 @@ import {
 
 import { useGetblog_categoryQuery } from "../../redux/feature/category";
 import { FolderOpen } from "lucide-react";
+import RichTextEditor from "../../shared/Description";
+
 
 const BlogManagement = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const BlogManagement = () => {
   const categories = catRes?.data || [];
 
   // Mutations
-  const [deleteBlog] = useDelete_blogsMutation();
+  const [deleteBlog, { isLoading: isDeleting }] = useDelete_blogsMutation();
   const [createBlog, { isLoading: creating }] = useCreate_blogsMutation();
   const [updateBlog, { isLoading: updating }] = useUpdate_blogsMutation();
 
@@ -145,7 +146,7 @@ const BlogManagement = () => {
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
         <div>
-          <h1 className="text-xl font-bold" style={{ color: "var(--color-secondary)" }}>Blog Management</h1>
+          <h1 className="text-xl font-bold text-gray-800">Blog Management</h1>
           <p className="text-gray-500 text-xs">
             Manage your content and categories
           </p>
@@ -171,104 +172,120 @@ const BlogManagement = () => {
           actions={(row) => (
             <ActionButtons
               onEdit={() => handleEdit(row)}
-              onDelete={() => { setDeleteId(row.id); setConfirmOpen(true); }}
+              onDelete={() => {
+                setDeleteId(row.id);
+                setConfirmOpen(true);
+              }}
             />
           )}
         />
       </div>
 
-      {/* MOBILE CARDS */}
       <div className="lg:hidden space-y-3">
-        {blogs.map((blog) => {
-          const cat = categories.find((c) => String(c.category_id) === String(blog.category_id));
-          return (
-            <div key={blog.id} className="bg-white rounded-xl shadow-sm border p-4">
-              <div className="flex justify-between items-start gap-2">
-                <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <img src={blog.image_url ? `${imgurl}/${blog.image_url}` : "/placeholder.png"} className="w-14 h-10 object-cover rounded shrink-0" alt="" />
-                  <div className="min-w-0">
-                    <p className="font-medium text-gray-700 truncate">{blog.title}</p>
-                    <span className="text-xs text-gray-500">{cat?.category_name || "N/A"}</span>
-                    <div className="text-gray-500 text-xs mt-1 line-clamp-2" dangerouslySetInnerHTML={{ __html: blog.description }} />
-                  </div>
-                </div>
-                <ActionButtons
-                  onEdit={() => handleEdit(blog)}
-                  onDelete={() => { setDeleteId(blog.id); setConfirmOpen(true); }}
+        {blogs.map((row, index) => (
+          <div key={row.id} className="bg-white rounded-xl shadow-sm border p-4">
+            <div className="flex justify-between items-start">
+              <div className="flex items-start gap-3 flex-1">
+                <img
+                  src={row.image_url ? `${imgurl}/${row.image_url}` : "/placeholder.png"}
+                  className="w-14 h-10 object-cover rounded shrink-0"
+                  alt=""
                 />
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-700 line-clamp-1">{row.title}</p>
+                  <span className="text-xs text-gray-500">{categories.find((c) => String(c.category_id) === String(row.category_id))?.category_name || "N/A"}</span>
+                  <div className="text-xs text-gray-400 mt-1 line-clamp-2" dangerouslySetInnerHTML={{ __html: row.description }} />
+                </div>
               </div>
+              <ActionButtons
+                onEdit={() => handleEdit(row)}
+                onDelete={() => { setDeleteId(row.id); setConfirmOpen(true); }}
+              />
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* MODAL */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingBlog ? "Edit Blog" : "Add Blog"}
-        size="lg"
+        title={editingBlog ? "Edit Blog" : "Create New Blog"}
+        size="md"
       >
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-          <FormInput
-            label="Blog Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter blog title..."
-            required
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormSelect
-              label="Category"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              options={categories.map(c => ({ value: c.category_id, label: c.category_name }))}
-              placeholder="Select Category"
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="space-y-4">
+            <FormInput
+              label="Blog Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter a catchy blog title..."
               required
+              className="text-gray-800 font-medium"
             />
 
-            <FormInput
-              label="Published Date"
-              type="date"
-              value={publishedDate}
-              onChange={(e) => setPublishedDate(e.target.value)}
-              required
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 p-3 rounded-xl border border-gray-100/50">
+              <FormSelect
+                label="Category"
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                options={categories.map((c) => ({
+                  value: c.category_id,
+                  label: c.category_name,
+                }))}
+                required
+              />
+              <FormInput
+                label="Published Date"
+                type="date"
+                value={publishedDate}
+                onChange={(e) => setPublishedDate(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-700 pl-1">
+              Blog Content
+            </label>
+            <div className="border border-gray-200 rounded-xl overflow-hidden shadow-xs focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all bg-white min-h-[200px]">
+              <RichTextEditor
+                initialContent={description}
+                onChange={(val) => setDescription(val)}
+                placeholder="Write your amazing blog description here..."
+              />
+            </div>
+          </div>
+
+          <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-100/50">
+            <FormImageUpload
+              label="Cover Image"
+              image={imageFile}
+              onImageChange={(e) => setImageFile(e.target.files[0])}
+              onImageRemove={() => setImageFile(null)}
+              existingImageUrl={editingBlog?.image_url ? `${imgurl}/${editingBlog.image_url}` : null}
+              previewShape="rounded-xl"
+              previewSize="w-full h-40 object-cover"
             />
           </div>
 
-          <RichTextEditor
-            initialContent={description}
-            onChange={(val) => setDescription(val)}
-            placeholder="Write blog description..."
-          />
-
-          <FormImageUpload
-            label="Blog Image"
-            image={imageFile}
-            onImageChange={(e) => setImageFile(e.target.files[0])}
-            onImageRemove={() => setImageFile(null)}
-            existingImageUrl={editingBlog?.image_url ? `${imgurl}/${editingBlog.image_url}` : null}
-            previewShape="rounded-xl"
-            previewSize="w-24 h-24"
-            hint="PNG, JPG up to 5MB"
-          />
-
-          <div className="flex gap-2 sm:gap-3 pt-2">
+          <div className="flex gap-3 pt-2">
             <Button
               variant="outline"
-              className="flex-1"
+              type="button"
               onClick={() => setIsModalOpen(false)}
+              className="flex-1"
+              disabled={creating || updating}
             >
               Cancel
             </Button>
-
             <Button
               type="submit"
-              className="flex-1"
+              className="flex-1 shadow-md shadow-blue-500/20"
               isLoading={creating || updating}
             >
-              {editingBlog ? "Update" : "Publish"}
+              {creating ? "Publishing..." : updating ? "Updating..." : editingBlog ? "Update Blog" : "Publish Blog"}
             </Button>
           </div>
         </form>
@@ -276,10 +293,14 @@ const BlogManagement = () => {
 
       <ConfirmDialog
         isOpen={confirmOpen}
-        onClose={() => { setConfirmOpen(false); setDeleteId(null); }}
+        onClose={() => {
+          setConfirmOpen(false);
+          setDeleteId(null);
+        }}
         onConfirm={handleDeleteClick}
         title="Delete Blog?"
         message="Are you sure you want to delete this blog? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );

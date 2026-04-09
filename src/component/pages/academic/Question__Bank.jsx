@@ -19,13 +19,12 @@ import {
 
 const QuestionBankAdmin = () => {
   const { data, isLoading } = useGetquestion_bankQuery();
-
   const questions = data?.data || [];
   const [createQuestion, { isLoading: isCreating }] =
     useCreatequestion_bankMutation();
   const [updateQuestion, { isLoading: isUpdating }] =
     useUpdatequestion_bankMutation();
-  const [deleteQuestion] = useDeletequestion_bankMutation();
+  const [deleteQuestion, { isLoading: isDeleting }] = useDeletequestion_bankMutation();
   const baseurl = import.meta.env.VITE_BASE_URL;
 
   const [modal, setModal] = useState(false);
@@ -46,21 +45,21 @@ const QuestionBankAdmin = () => {
     setForm(
       question
         ? {
-            title: question.title,
-            subject: question.subject,
-            class_level: question.class_level,
-            year: question.year,
-            description: question.description,
-            file: null,
-          }
+          title: question.title,
+          subject: question.subject,
+          class_level: question.class_level,
+          year: question.year,
+          description: question.description,
+          file: null,
+        }
         : {
-            title: "",
-            subject: "",
-            class_level: "",
-            year: "",
-            description: "",
-            file: null,
-          },
+          title: "",
+          subject: "",
+          class_level: "",
+          year: "",
+          description: "",
+          file: null,
+        },
     );
     setModal(true);
   };
@@ -109,14 +108,7 @@ const QuestionBankAdmin = () => {
     {
       header: "Subject",
       render: (row) => (
-        <span
-          className="px-2 py-0.5 rounded-full text-xs"
-          style={{
-            backgroundColor:
-              "color-mix(in srgb, var(--color-secondary) 10%, white)",
-            color: "var(--color-secondary)",
-          }}
-        >
+        <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs">
           {row.subject}
         </span>
       ),
@@ -134,8 +126,7 @@ const QuestionBankAdmin = () => {
           <a
             href={`${baseurl}/${row.file_url}`}
             target="_blank"
-            className="underline text-xs"
-            style={{ color: "var(--color-secondary)" }}
+            className="text-blue-600 underline text-xs"
           >
             View PDF
           </a>
@@ -165,7 +156,6 @@ const QuestionBankAdmin = () => {
         <AddButton onClick={() => openModal()} label="Add Question" />
       </PageHeader>
 
-      {/* DESKTOP TABLE */}
       <div className="hidden lg:block">
         <Table
           columns={columns}
@@ -182,26 +172,25 @@ const QuestionBankAdmin = () => {
         />
       </div>
 
-      {/* MOBILE CARDS */}
       <div className="lg:hidden space-y-3">
-        {questions.map((q, index) => (
-          <div key={q.id} className="bg-white rounded-xl shadow-sm border p-4">
+        {questions.map((row, index) => (
+          <div key={row.id} className="bg-white rounded-xl shadow-sm border p-4">
             <div className="flex justify-between items-start mb-2">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1">
                 <span className="text-xs text-gray-400">#{index + 1}</span>
-                <h3 className="font-medium text-gray-700 truncate">{q.title}</h3>
+                <h3 className="font-medium text-gray-700">{row.title}</h3>
+                <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs">{row.subject}</span>
               </div>
               <ActionButtons
-                onEdit={() => openModal(q)}
-                onDelete={() => { setDeleteId(q.id); setConfirmOpen(true); }}
+                onEdit={() => openModal(row)}
+                onDelete={() => { setDeleteId(row.id); setConfirmOpen(true); }}
               />
             </div>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="px-2 py-0.5 rounded-full" style={{ backgroundColor: "color-mix(in srgb, var(--color-secondary) 10%, white)", color: "var(--color-secondary)" }}>{q.subject}</span>
-              <span className="text-gray-500">Class {q.class_level}</span>
-              <span className="text-gray-500">{q.year}</span>
-              {q.file_type === "pdf" && (
-                <a href={`${baseurl}/${q.file_url}`} target="_blank" className="underline" style={{ color: "var(--color-secondary)" }}>View PDF</a>
+            <div className="flex gap-3 text-xs text-gray-500 mt-2">
+              <span>Class: {row.class_level}</span>
+              <span>Year: {row.year}</span>
+              {row.file_type === "pdf" && (
+                <a href={`${baseurl}/${row.file_url}`} target="_blank" className="text-blue-600 underline">View PDF</a>
               )}
             </div>
           </div>
@@ -282,7 +271,7 @@ const QuestionBankAdmin = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editing ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editing ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -297,6 +286,7 @@ const QuestionBankAdmin = () => {
         onConfirm={handleDelete}
         title="Delete Question?"
         message="Are you sure you want to delete this question? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );

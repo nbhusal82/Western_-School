@@ -57,8 +57,8 @@ const Team = () => {
     selectedCategory === "All"
       ? teamMembers
       : teamMembers.filter(
-          (m) => String(m.category_id) === String(selectedCategory),
-        );
+        (m) => String(m.category_id) === String(selectedCategory),
+      );
 
   // 3. Edit / Delete Handlers
   const handleEdit = (member) => {
@@ -93,7 +93,7 @@ const Team = () => {
   // 4. Form Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const data = new FormData();
     data.append("name", formData.name);
     data.append("position", formData.position);
@@ -124,7 +124,10 @@ const Team = () => {
       });
     } catch (err) {
       console.error("Error saving team member:", err);
-      const errorMsg = err?.data?.message || err?.message || "Failed to save. Please try again.";
+      const errorMsg =
+        err?.data?.message ||
+        err?.message ||
+        "Failed to save. Please try again.";
       alert(`Error: ${errorMsg}`);
     }
   };
@@ -158,7 +161,7 @@ const Team = () => {
           (c) => String(c.category_id || c.id) === String(row.category_id),
         );
         return (
-          <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider" style={{ color: "var(--color-secondary)", backgroundColor: "color-mix(in srgb, var(--color-secondary) 10%, white)" }}>
+          <span className="text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider">
             {cat?.category_name || cat?.name || "Uncategorized"}
           </span>
         );
@@ -207,12 +210,10 @@ const Team = () => {
       <div className="flex flex-wrap gap-2 mb-8 bg-white p-2.5 rounded-2xl shadow-sm border border-gray-100">
         <button
           onClick={() => setSelectedCategory("All")}
-          className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
-            selectedCategory === "All"
-              ? "text-white shadow-lg"
-              : "bg-gray-50 text-gray-400 hover:bg-gray-100"
-          }`}
-          style={selectedCategory === "All" ? { backgroundColor: "var(--color-secondary)" } : {}}
+          className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${selectedCategory === "All"
+            ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
+            : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+            }`}
         >
           All Members
         </button>
@@ -223,12 +224,10 @@ const Team = () => {
             <button
               key={catId}
               onClick={() => setSelectedCategory(catId)}
-              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
-                String(selectedCategory) === String(catId)
-                  ? "text-white shadow-lg"
-                  : "bg-gray-50 text-gray-400 hover:bg-gray-100"
-              }`}
-              style={String(selectedCategory) === String(catId) ? { backgroundColor: "var(--color-secondary)" } : {}}
+              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${String(selectedCategory) === String(catId)
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
+                : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                }`}
             >
               {catName}
             </button>
@@ -250,35 +249,31 @@ const Team = () => {
         />
       </div>
 
-      {/* MOBILE CARDS */}
       <div className="lg:hidden space-y-3">
-        {filteredMembers.map((member) => {
-          const cat = categories.find((c) => String(c.category_id || c.id) === String(member.category_id));
-          return (
-            <div key={member.id} className="bg-white rounded-xl shadow-sm border p-4">
-              <div className="flex justify-between items-start gap-2">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <img src={`${imgurl}/${member.image}`} className="w-12 h-12 rounded-full object-cover border border-gray-100 shadow-sm shrink-0" alt={member.name} />
-                  <div className="min-w-0">
-                    <p className="font-bold text-gray-700 truncate">{member.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{member.position}</p>
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-lg uppercase" style={{ color: "var(--color-secondary)", backgroundColor: "color-mix(in srgb, var(--color-secondary) 10%, white)" }}>
-                      {cat?.category_name || cat?.name || "Uncategorized"}
-                    </span>
-                  </div>
+        {filteredMembers.map((row) => (
+          <div key={row.id} className="bg-white rounded-xl shadow-sm border p-4">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-3 flex-1">
+                <img src={`${imgurl}/${row.image}`} className="w-12 h-12 rounded-full object-cover border shrink-0" alt={row.name} />
+                <div className="min-w-0">
+                  <p className="font-bold text-gray-700">{row.name}</p>
+                  <p className="text-xs text-gray-500">{row.position}</p>
+                  <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg text-[10px] font-black uppercase">
+                    {categories.find((c) => String(c.category_id || c.id) === String(row.category_id))?.category_name || "Uncategorized"}
+                  </span>
                 </div>
-                <ActionButtons
-                  onEdit={() => handleEdit(member)}
-                  onDelete={() => handleDeleteClick(member.id)}
-                />
               </div>
-              <div className="mt-2 text-xs text-gray-500 flex gap-3">
-                <span>{member.number || "No Phone"}</span>
-                <span className="truncate">{member.email || "No Email"}</span>
-              </div>
+              <ActionButtons
+                onEdit={() => handleEdit(row)}
+                onDelete={() => handleDeleteClick(row.id)}
+              />
             </div>
-          );
-        })}
+            <div className="text-xs text-gray-500 mt-2 pl-15">
+              <p>{row.number || "No Phone"}</p>
+              <p>{row.email || "No Email"}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* ADD/EDIT MODAL */}
@@ -315,7 +310,7 @@ const Team = () => {
               }
               options={[
                 { value: "teacher", label: "Teacher" },
-                { value: "committee", label: "Committee" }
+                { value: "committee", label: "Committee" },
               ]}
               placeholder="Select Role"
               required
@@ -386,7 +381,7 @@ const Team = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editingMember ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingMember ? "Update" : "Save"}
             </Button>
           </div>
         </form>

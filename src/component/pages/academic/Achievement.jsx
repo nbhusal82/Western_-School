@@ -18,7 +18,7 @@ const Achievement = () => {
 
   const [createAch, { isLoading: isCreating }] = useCreateachievementMutation();
   const [updateAch, { isLoading: isUpdating }] = useUpdateachievementMutation();
-  const [deleteAch] = useDeleteachievementMutation();
+  const [deleteAch, { isLoading: isDeleting }] = useDeleteachievementMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAch, setEditingAch] = useState(null);
@@ -107,20 +107,20 @@ const Achievement = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {achievements.map((ach) => (
-          <div key={ach.id} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition group">
+          <div key={ach.id} className="bg-white rounded-2xl shadow-sm border overflow-hidden hover:shadow-md transition group flex flex-col">
             <div className="relative h-40 bg-gray-200">
               <img src={`${imgurl}/${ach.image_urls}`} alt="" className="w-full h-full object-cover" />
-              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                <ActionButtons onEdit={() => handleEdit(ach)} onDelete={() => { setDeleteId(ach.id); setConfirmOpen(true); }} />
-              </div>
             </div>
-            <div className="p-4">
+            <div className="p-4 flex flex-col flex-1">
               <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase mb-1">
                 <Calendar size={12} />
                 {new Date(ach.achievement_date).toLocaleDateString()}
               </div>
               <h3 className="font-bold text-gray-800 line-clamp-1">{ach.title}</h3>
               <p className="text-xs text-gray-500 mt-1 line-clamp-2 h-8">{ach.description}</p>
+              <div className="mt-3 flex justify-end border-t border-gray-50 pt-3">
+                <ActionButtons onEdit={() => handleEdit(ach)} onDelete={() => { setDeleteId(ach.id); setConfirmOpen(true); }} />
+              </div>
             </div>
           </div>
         ))}
@@ -170,7 +170,7 @@ const Achievement = () => {
               Cancel
             </Button>
             <Button type="submit" className="flex-1" isLoading={isCreating || isUpdating}>
-              {editingAch ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingAch ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -182,6 +182,7 @@ const Achievement = () => {
         onConfirm={handleDelete}
         title="Delete Achievement?"
         message="Are you sure you want to delete this achievement? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );

@@ -32,7 +32,7 @@ const Gallery = () => {
 
   const [createGallery, { isLoading: isCreating }] = useCreategalleryMutation();
   const [updateGallery, { isLoading: isUpdating }] = useUpdategalleryMutation();
-  const [deleteGallery] = useDeletegalleryMutation();
+  const [deleteGallery, { isLoading: isDeleting }] = useDeletegalleryMutation();
 
   const [createCategory, { isLoading: isCreatingCat }] =
     useCreatecategory_galleryMutation();
@@ -65,8 +65,8 @@ const Gallery = () => {
     selectedCategory === "All"
       ? gallery?.data || []
       : (gallery?.data || []).filter(
-          (n) => String(n.category_id) === String(selectedCategory),
-        );
+        (n) => String(n.category_id) === String(selectedCategory),
+      );
 
   // Gallery Handlers
   const openGalleryModal = (item = null) => {
@@ -175,12 +175,10 @@ const Gallery = () => {
       <div className="flex flex-wrap gap-2 mb-8 items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100">
         <button
           onClick={() => setSelectedCategory("All")}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-            selectedCategory === "All"
-              ? "text-white shadow-md"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-          }`}
-          style={selectedCategory === "All" ? { backgroundColor: "var(--color-secondary)" } : {}}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${selectedCategory === "All"
+            ? "bg-blue-600 text-white shadow-md"
+            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            }`}
         >
           All Items
         </button>
@@ -189,12 +187,10 @@ const Gallery = () => {
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-              String(selectedCategory) === String(cat.id)
-                ? "text-white shadow-md"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-            style={String(selectedCategory) === String(cat.id) ? { backgroundColor: "var(--color-secondary)" } : {}}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${String(selectedCategory) === String(cat.id)
+              ? "bg-blue-600 text-white shadow-md"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
           >
             {cat.category_name}
           </button>
@@ -234,7 +230,7 @@ const Gallery = () => {
                   </Swiper>
                 </div>
                 <div className="p-4">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase" style={{ color: "var(--color-secondary)", backgroundColor: "color-mix(in srgb, var(--color-secondary) 10%, white)" }}>
+                  <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">
                     {catName}
                   </span>
                   <p className="mt-2 text-sm text-gray-700 font-medium line-clamp-2">
@@ -245,8 +241,7 @@ const Gallery = () => {
                       onClick={() => openGalleryModal(item)}
                       variant="outline"
                       size="sm"
-                      className="flex-1 border-[var(--color-secondary)]"
-                      style={{ color: "var(--color-secondary)" }}
+                      className="flex-1 text-blue-600 border-blue-200 hover:bg-blue-50"
                     >
                       Edit
                     </Button>
@@ -306,7 +301,7 @@ const Gallery = () => {
               multiple
               accept="image/*"
               onChange={(e) => setGalleryForm({ ...galleryForm, images: e.target.files })}
-            className="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[color-mix(in_srgb,var(--color-secondary)_10%,white)] file:text-[var(--color-secondary)] hover:file:bg-[color-mix(in_srgb,var(--color-secondary)_20%,white)] cursor-pointer transition-all"
+              className="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer transition-all"
             />
             <p className="text-[10px] text-gray-400 mt-1.5 ml-1">PNG, JPG - Multiple files allowed</p>
           </div>
@@ -325,7 +320,7 @@ const Gallery = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editingGallery ? "Update" : "Upload"}
+              {isCreating ? "Uploading..." : isUpdating ? "Updating..." : editingGallery ? "Update" : "Upload"}
             </Button>
           </div>
         </form>
@@ -349,7 +344,7 @@ const Gallery = () => {
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
               placeholder="e.g. Campus Events"
-            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] outline-none text-sm"
+              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
             />
           </div>
 
@@ -367,7 +362,7 @@ const Gallery = () => {
               className="flex-1"
               isLoading={isCreatingCat || isUpdatingCat}
             >
-              {editingCategory ? "Update" : "Save"}
+              {isCreatingCat ? "Saving..." : isUpdatingCat ? "Updating..." : editingCategory ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -379,6 +374,7 @@ const Gallery = () => {
         onConfirm={handleDeleteGallery}
         title="Delete Gallery?"
         message="Are you sure you want to delete this gallery item? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );

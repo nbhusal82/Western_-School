@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -16,13 +17,13 @@ import {
 
 const Vacancy_Category = () => {
   const navigate = useNavigate();
- const { data, isLoading } = useGet_vacancy_categoryQuery();
- const categories = data?.data || [];
+  const { data, isLoading } = useGet_vacancy_categoryQuery();
+  const categories = data?.data || [];
   const [createCategory, { isLoading: isCreating }] =
     useCreatecategory_vacancyMutation();
   const [updateCategory, { isLoading: isUpdating }] =
     useUpdatecategory_vacancyMutation();
-  const [deleteCategory] = useDeletecategory_vacancyMutation();
+  const [deleteCategory, { isLoading: isDeleting }] = useDeletecategory_vacancyMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -62,7 +63,7 @@ const Vacancy_Category = () => {
 
   if (isLoading)
     return (
-      <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 min-h-screen">
         <PageHeader
           title="Vacancy Categories"
           subtitle="Manage vacancy categories"
@@ -99,7 +100,7 @@ const Vacancy_Category = () => {
   ];
 
   return (
-    <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <PageHeader
         title="Vacancy Categories"
         subtitle="Manage vacancy categories"
@@ -121,21 +122,40 @@ const Vacancy_Category = () => {
       </PageHeader>
 
       <div className="max-w-4xl mx-auto">
-        <Table
-          columns={columns}
-          data={categories}
-          actions={(row) => (
-            <ActionButtons
-              onEdit={() => {
-                setEditingCategory(row);
-                setName(row.category_name);
-                setModalOpen(true);
-              }}
-              onDelete={() => { setDeleteId(row.category_id); setConfirmOpen(true); }}
-            />
-          )}
-          emptyMessage="No categories found"
-        />
+        <div className="hidden lg:block">
+          <Table
+            columns={columns}
+            data={categories}
+            actions={(row) => (
+              <ActionButtons
+                onEdit={() => {
+                  setEditingCategory(row);
+                  setName(row.category_name);
+                  setModalOpen(true);
+                }}
+                onDelete={() => {
+                  setDeleteId(row.category_id);
+                  setConfirmOpen(true);
+                }}
+              />
+            )}
+            emptyMessage="No categories found"
+          />
+        </div>
+        <div className="lg:hidden space-y-3">
+          {categories.map((row, index) => (
+            <div key={row.category_id} className="bg-white rounded-xl shadow-sm border p-4 flex justify-between items-center">
+              <div>
+                <span className="text-xs text-gray-400">#{index + 1}</span>
+                <p className="font-medium text-gray-700">{row.category_name}</p>
+              </div>
+              <ActionButtons
+                onEdit={() => { setEditingCategory(row); setName(row.category_name); setModalOpen(true); }}
+                onDelete={() => { setDeleteId(row.category_id); setConfirmOpen(true); }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       <Modal
@@ -171,7 +191,7 @@ const Vacancy_Category = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editingCategory ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingCategory ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -179,10 +199,14 @@ const Vacancy_Category = () => {
 
       <ConfirmDialog
         isOpen={confirmOpen}
-        onClose={() => { setConfirmOpen(false); setDeleteId(null); }}
+        onClose={() => {
+          setConfirmOpen(false);
+          setDeleteId(null);
+        }}
         onConfirm={handleDelete}
         title="Delete Category?"
         message="Are you sure you want to delete this category? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );

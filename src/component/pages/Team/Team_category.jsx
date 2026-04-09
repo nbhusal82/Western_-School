@@ -30,7 +30,7 @@ const TeamCategory = () => {
     useCreate_team_categoryMutation();
   const [updateCat, { isLoading: isUpdating }] =
     useUpdate_team_categoryMutation();
-  const [deleteCat] = useDelete_team_categoryMutation();
+  const [deleteCat, { isLoading: isDeleting }] = useDelete_team_categoryMutation();
 
   // Local States
   const [modalOpen, setModalOpen] = useState(false);
@@ -94,7 +94,7 @@ const TeamCategory = () => {
 
   if (isFetching)
     return (
-      <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 min-h-screen">
         <PageHeader title="Team Categories" subtitle="Organize your staff departments">
           <button onClick={() => navigate("/admin/team")} className="p-2.5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:bg-gray-50 transition active:scale-90">
             <ArrowLeft size={20} className="text-gray-600" />
@@ -121,7 +121,7 @@ const TeamCategory = () => {
   ];
 
   return (
-    <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <PageHeader title="Team Categories" subtitle="Organize your staff departments">
         <button onClick={() => navigate("/admin/team")} className="p-2.5 bg-white border border-gray-100 rounded-2xl shadow-sm hover:bg-gray-50 transition active:scale-90 mr-2">
           <ArrowLeft size={20} className="text-gray-600" />
@@ -130,17 +130,33 @@ const TeamCategory = () => {
       </PageHeader>
 
       <div className="max-w-4xl mx-auto">
-        <Table
-          columns={columns}
-          data={categories}
-          actions={(row) => (
-            <ActionButtons
-              onEdit={() => handleEdit(row)}
-              onDelete={() => { setDeleteId(row.category_id || row.id); setConfirmOpen(true); }}
-            />
-          )}
-          emptyMessage="No Categories Found"
-        />
+        <div className="hidden lg:block">
+          <Table
+            columns={columns}
+            data={categories}
+            actions={(row) => (
+              <ActionButtons
+                onEdit={() => handleEdit(row)}
+                onDelete={() => { setDeleteId(row.category_id || row.id); setConfirmOpen(true); }}
+              />
+            )}
+            emptyMessage="No Categories Found"
+          />
+        </div>
+        <div className="lg:hidden space-y-3">
+          {categories.map((row, index) => (
+            <div key={row.category_id || row.id} className="bg-white rounded-xl shadow-sm border p-4 flex justify-between items-center">
+              <div>
+                <span className="text-xs text-gray-400">#{index + 1}</span>
+                <p className="font-bold text-gray-700">{row.category_name || row.name}</p>
+              </div>
+              <ActionButtons
+                onEdit={() => handleEdit(row)}
+                onDelete={() => { setDeleteId(row.category_id || row.id); setConfirmOpen(true); }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       <Modal
@@ -162,7 +178,7 @@ const TeamCategory = () => {
               placeholder="e.g. Administration"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
-              className="w-full border border-gray-100 bg-gray-50/50 px-5 py-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[var(--color-secondary)] outline-none transition-all"
+              className="w-full border border-gray-100 bg-gray-50/50 px-5 py-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             />
           </div>
 
@@ -181,7 +197,7 @@ const TeamCategory = () => {
               className="flex-2"
               isLoading={isCreating || isUpdating}
             >
-              {editingCat ? "Update Now" : "Create Dept"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingCat ? "Update Now" : "Create Dept"}
             </Button>
           </div>
         </form>
@@ -193,6 +209,7 @@ const TeamCategory = () => {
         onConfirm={handleDelete}
         title="Delete Category?"
         message="Are you sure? Members linked to this category might be affected."
+        isLoading={isDeleting}
       />
     </div>
   );

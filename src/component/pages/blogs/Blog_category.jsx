@@ -23,7 +23,7 @@ const BlogCategory = () => {
     useCreate_blogs_categoryMutation();
   const [updateCategory, { isLoading: isUpdating }] =
     useUpdate_blogs_categoryMutation();
-  const [deleteCategory] = useDelete_blogs_categoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] = useDelete_blogs_categoryMutation();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCat, setEditingCat] = useState(null);
@@ -72,7 +72,7 @@ const BlogCategory = () => {
 
   if (isLoading)
     return (
-      <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 min-h-screen">
         <PageHeader title="Blog Categories" subtitle="Manage blog categories">
           <button
             onClick={() => navigate("/admin/blog")}
@@ -106,7 +106,7 @@ const BlogCategory = () => {
   ];
 
   return (
-    <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <PageHeader title="Blog Categories" subtitle="Manage blog categories">
         <button
           onClick={() => navigate("/admin/blog")}
@@ -118,17 +118,33 @@ const BlogCategory = () => {
       </PageHeader>
 
       <div className="max-w-4xl mx-auto">
-        <Table
-          columns={columns}
-          data={categories}
-          actions={(row) => (
-            <ActionButtons
-              onEdit={() => openEdit(row)}
-              onDelete={() => { setDeleteId(row.category_id); setConfirmOpen(true); }}
-            />
-          )}
-          emptyMessage="No categories found"
-        />
+        <div className="hidden lg:block">
+          <Table
+            columns={columns}
+            data={categories}
+            actions={(row) => (
+              <ActionButtons
+                onEdit={() => openEdit(row)}
+                onDelete={() => { setDeleteId(row.category_id); setConfirmOpen(true); }}
+              />
+            )}
+            emptyMessage="No categories found"
+          />
+        </div>
+        <div className="lg:hidden space-y-3">
+          {categories.map((row, index) => (
+            <div key={row.category_id} className="bg-white rounded-xl shadow-sm border p-4 flex justify-between items-center">
+              <div>
+                <span className="text-xs text-gray-400">#{index + 1}</span>
+                <p className="font-medium text-gray-700">{row.category_name}</p>
+              </div>
+              <ActionButtons
+                onEdit={() => openEdit(row)}
+                onDelete={() => { setDeleteId(row.category_id); setConfirmOpen(true); }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       <Modal
@@ -144,7 +160,7 @@ const BlogCategory = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Category name"
-            className="w-full border border-gray-200 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] outline-none text-sm"
+            className="w-full border border-gray-200 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
           />
           <div className="flex gap-2 pt-1">
             <Button
@@ -160,7 +176,7 @@ const BlogCategory = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editingCat ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingCat ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -172,6 +188,7 @@ const BlogCategory = () => {
         onConfirm={handleDelete}
         title="Delete Category?"
         message="Are you sure you want to delete this category? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );

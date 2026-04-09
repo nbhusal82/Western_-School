@@ -43,7 +43,7 @@ const VacancyManagement = () => {
 
   const [createVacancy, { isLoading: isCreating }] = useCreatevacancyMutation();
   const [updateVacancy, { isLoading: isUpdating }] = useUpdatevacancyMutation();
-  const [deleteVacancy] = useDeletevacancyMutation();
+  const [deleteVacancy, { isLoading: isDeleting }] = useDeletevacancyMutation();
 
   const [createCategory, { isLoading: isCreatingCat }] =
     useCreatecategory_vacancyMutation();
@@ -76,19 +76,19 @@ const VacancyManagement = () => {
     setVacancyForm(
       item
         ? {
-            title: item.title,
-            category_id: item.category_id,
-            description: item.description,
-            deadline: item.application_deadline,
-            status: item.status || "open",
-          }
+          title: item.title,
+          category_id: item.category_id,
+          description: item.description,
+          deadline: item.application_deadline,
+          status: item.status || "open",
+        }
         : {
-            title: "",
-            category_id: "",
-            description: "",
-            deadline: "",
-            status: "open",
-          },
+          title: "",
+          category_id: "",
+          description: "",
+          deadline: "",
+          status: "open",
+        },
     );
     setVacancyModal(true);
   };
@@ -200,13 +200,12 @@ const VacancyManagement = () => {
         <select
           value={row.status}
           onChange={(e) => handleStatusChange(row, e.target.value)}
-          className={`border rounded px-2 py-1 text-sm font-semibold ${
-            row.status === "open"
+          className={`border rounded px-2 py-1 text-sm font-semibold ${row.status === "open"
               ? "text-green-600"
               : row.status === "closed"
                 ? "text-red-600"
                 : "text-yellow-600"
-          }`}
+            }`}
         >
           <option value="open">Open</option>
           <option value="closed">Closed</option>
@@ -240,7 +239,6 @@ const VacancyManagement = () => {
         <AddButton onClick={() => openVacancyModal()} label="Add Vacancy" />
       </PageHeader>
 
-      {/* DESKTOP TABLE */}
       <div className="hidden lg:block">
         <Table
           columns={columns}
@@ -257,40 +255,35 @@ const VacancyManagement = () => {
         />
       </div>
 
-      {/* MOBILE CARDS */}
       <div className="lg:hidden space-y-3">
-        {vacancyItems.map((item) => {
-          const cat = categories.find((c) => String(c.category_id) === String(item.category_id));
-          return (
-            <div key={item.id} className="bg-white rounded-xl shadow-sm border p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-700 truncate">{item.title}</h3>
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "color-mix(in srgb, var(--color-secondary) 10%, white)", color: "var(--color-secondary)" }}>{cat?.category_name || "N/A"}</span>
-                </div>
-                <ActionButtons
-                  onEdit={() => openVacancyModal(item)}
-                  onDelete={() => { setDeleteId(item.id); setConfirmOpen(true); }}
-                />
+        {vacancyItems.map((row, index) => (
+          <div key={row.id} className="bg-white rounded-xl shadow-sm border p-4">
+            <div className="flex justify-between items-start mb-2">
+              <div className="flex-1">
+                <span className="text-xs text-gray-400">#{index + 1}</span>
+                <h3 className="font-medium text-gray-700">{row.title}</h3>
+                <span className="text-xs text-gray-500">{categories.find((c) => String(c.category_id) === String(row.category_id))?.category_name || "N/A"}</span>
               </div>
-              <div className="flex flex-wrap gap-3 text-xs text-gray-500 mt-2">
-                <span>Deadline: {formatDate(item.application_deadline)}</span>
-                <span>Posted: {formatDate(item.posted_date)}</span>
-                <select
-                  value={item.status}
-                  onChange={(e) => handleStatusChange(item, e.target.value)}
-                  className={`border rounded px-2 py-0.5 font-semibold ${
-                    item.status === "open" ? "text-green-600" : item.status === "closed" ? "text-red-600" : "text-yellow-600"
-                  }`}
-                >
-                  <option value="open">Open</option>
-                  <option value="closed">Closed</option>
-                  <option value="pending">Pending</option>
-                </select>
-              </div>
+              <ActionButtons
+                onEdit={() => openVacancyModal(row)}
+                onDelete={() => { setDeleteId(row.id); setConfirmOpen(true); }}
+              />
             </div>
-          );
-        })}
+            <div className="flex gap-4 text-xs text-gray-500 mt-2">
+              <span>Deadline: {formatDate(row.application_deadline)}</span>
+              <select
+                value={row.status}
+                onChange={(e) => handleStatusChange(row, e.target.value)}
+                className={`border rounded px-2 py-0.5 text-xs font-semibold ${row.status === "open" ? "text-green-600" : row.status === "closed" ? "text-red-600" : "text-yellow-600"
+                  }`}
+              >
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* VACANCY MODAL */}
@@ -362,7 +355,7 @@ const VacancyManagement = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editingVacancy ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingVacancy ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -386,7 +379,7 @@ const VacancyManagement = () => {
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
               placeholder="e.g. IT Department"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] outline-none text-sm"
+              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
             />
           </div>
 
@@ -403,7 +396,7 @@ const VacancyManagement = () => {
               className="flex-1"
               isLoading={isCreatingCat || isUpdatingCat}
             >
-              {editingCategory ? "Update" : "Save"}
+              {isCreatingCat ? "Saving..." : isUpdatingCat ? "Updating..." : editingCategory ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -419,6 +412,7 @@ const VacancyManagement = () => {
         onConfirm={handleDeleteVacancy}
         title="Delete Vacancy?"
         message="Are you sure you want to delete this vacancy? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );

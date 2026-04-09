@@ -22,7 +22,7 @@ const GalleryCategory = () => {
 
   const [createCategory, { isLoading: isCreating }] =
     useCreatecategory_galleryMutation();
-  const [deleteCategory] = useDeletecategory_galleryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] = useDeletecategory_galleryMutation();
   const [updateCategory, { isLoading: isUpdating }] =
     useUpdatecategory_galleryMutation();
 
@@ -72,7 +72,7 @@ const GalleryCategory = () => {
 
   if (isLoading)
     return (
-      <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 min-h-screen">
         <PageHeader
           title="Gallery Categories"
           subtitle="Manage and organize your photo albums"
@@ -104,7 +104,7 @@ const GalleryCategory = () => {
       accessor: "name",
       render: (row) => (
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-md" style={{ backgroundColor: "color-mix(in srgb, var(--color-secondary) 10%, white)", color: "var(--color-secondary)" }}>
+          <div className="p-2 bg-blue-50 rounded-md text-blue-500">
             <FolderOpen size={16} />
           </div>
           <span className="font-medium text-gray-700">
@@ -116,7 +116,7 @@ const GalleryCategory = () => {
   ];
 
   return (
-    <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <PageHeader
         title="Gallery Categories"
         subtitle="Manage and organize your photo albums"
@@ -131,20 +131,39 @@ const GalleryCategory = () => {
       </PageHeader>
 
       <div className="max-w-4xl mx-auto">
-        <Table
-          columns={columns}
-          data={categories}
-          actions={(row) => (
-            <ActionButtons
-              onEdit={() => openModal(row)}
-              onDelete={() => {
-                setSelectedId(row.id);
-                setConfirmOpen(true);
-              }}
-            />
-          )}
-          emptyMessage='No categories found. Click "Add Category" to start.'
-        />
+        <div className="hidden lg:block">
+          <Table
+            columns={columns}
+            data={categories}
+            actions={(row) => (
+              <ActionButtons
+                onEdit={() => openModal(row)}
+                onDelete={() => {
+                  setSelectedId(row.id);
+                  setConfirmOpen(true);
+                }}
+              />
+            )}
+            emptyMessage='No categories found. Click "Add Category" to start.'
+          />
+        </div>
+        <div className="lg:hidden space-y-3">
+          {categories.map((row, index) => (
+            <div key={row.id} className="bg-white rounded-xl shadow-sm border p-4 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-50 rounded-md text-blue-500"><FolderOpen size={16} /></div>
+                <div>
+                  <span className="text-xs text-gray-400">#{index + 1}</span>
+                  <p className="font-medium text-gray-700">{row.category_name || row.name}</p>
+                </div>
+              </div>
+              <ActionButtons
+                onEdit={() => openModal(row)}
+                onDelete={() => { setSelectedId(row.id); setConfirmOpen(true); }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       <Modal
@@ -160,7 +179,7 @@ const GalleryCategory = () => {
             value={catName}
             onChange={(e) => setCatName(e.target.value)}
             placeholder="Category name"
-            className="w-full border border-gray-200 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-[var(--color-secondary)] outline-none text-sm"
+            className="w-full border border-gray-200 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
           />
           <div className="flex gap-2 pt-1">
             <Button
@@ -176,7 +195,7 @@ const GalleryCategory = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {editing ? "Update" : "Save"}
+              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editing ? "Update" : "Save"}
             </Button>
           </div>
         </form>
@@ -188,6 +207,7 @@ const GalleryCategory = () => {
         onConfirm={handleDelete}
         title="Delete Category?"
         message="Are you sure you want to delete this category? This action cannot be undone."
+        isLoading={isDeleting}
       />
     </div>
   );
