@@ -57,8 +57,8 @@ const Team = () => {
     selectedCategory === "All"
       ? teamMembers
       : teamMembers.filter(
-        (m) => String(m.category_id) === String(selectedCategory),
-      );
+          (m) => String(m.category_id) === String(selectedCategory),
+        );
 
   // 3. Edit / Delete Handlers
   const handleEdit = (member) => {
@@ -193,7 +193,7 @@ const Team = () => {
       >
         <button
           onClick={() => navigate("/admin/team/category")}
-          className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 mr-2"
+          className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-none text-sm hover:bg-gray-50 mr-2"
         >
           <FolderOpen size={16} /> Categories
         </button>
@@ -210,10 +210,11 @@ const Team = () => {
       <div className="flex flex-wrap gap-2 mb-8 bg-white p-2.5 rounded-2xl shadow-sm border border-gray-100">
         <button
           onClick={() => setSelectedCategory("All")}
-          className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${selectedCategory === "All"
-            ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
-            : "bg-gray-50 text-gray-400 hover:bg-gray-100"
-            }`}
+          className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+            selectedCategory === "All"
+              ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
+              : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+          }`}
         >
           All Members
         </button>
@@ -224,10 +225,11 @@ const Team = () => {
             <button
               key={catId}
               onClick={() => setSelectedCategory(catId)}
-              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${String(selectedCategory) === String(catId)
-                ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
-                : "bg-gray-50 text-gray-400 hover:bg-gray-100"
-                }`}
+              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                String(selectedCategory) === String(catId)
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
+                  : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+              }`}
             >
               {catName}
             </button>
@@ -236,7 +238,7 @@ const Team = () => {
       </div>
 
       {/* DATA TABLE */}
-      <div className="hidden lg:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="hidden lg:block">
         <Table
           columns={columns}
           data={filteredMembers}
@@ -251,15 +253,26 @@ const Team = () => {
 
       <div className="lg:hidden space-y-3">
         {filteredMembers.map((row) => (
-          <div key={row.id} className="bg-white rounded-xl shadow-sm border p-4">
+          <div
+            key={row.id}
+            className="bg-white rounded-none shadow-sm border p-4"
+          >
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-3 flex-1">
-                <img src={`${imgurl}/${row.image}`} className="w-12 h-12 rounded-full object-cover border shrink-0" alt={row.name} />
+                <img
+                  src={`${imgurl}/${row.image}`}
+                  className="w-12 h-12 rounded-full object-cover border shrink-0"
+                  alt={row.name}
+                />
                 <div className="min-w-0">
                   <p className="font-bold text-gray-700">{row.name}</p>
                   <p className="text-xs text-gray-500">{row.position}</p>
                   <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg text-[10px] font-black uppercase">
-                    {categories.find((c) => String(c.category_id || c.id) === String(row.category_id))?.category_name || "Uncategorized"}
+                    {categories.find(
+                      (c) =>
+                        String(c.category_id || c.id) ===
+                        String(row.category_id),
+                    )?.category_name || "Uncategorized"}
                   </span>
                 </div>
               </div>
@@ -381,7 +394,13 @@ const Team = () => {
               className="flex-1"
               isLoading={isCreating || isUpdating}
             >
-              {isCreating ? "Saving..." : isUpdating ? "Updating..." : editingMember ? "Update" : "Save"}
+              {isCreating
+                ? "Saving..."
+                : isUpdating
+                  ? "Updating..."
+                  : editingMember
+                    ? "Update"
+                    : "Save"}
             </Button>
           </div>
         </form>

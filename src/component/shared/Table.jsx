@@ -1,66 +1,76 @@
 import React from "react";
 
-const Table = ({ columns, data, actions, emptyMessage = "No data found" }) => {
+const Table = ({
+  columns,
+  data,
+  actions,
+  emptyMessage = "No data found",
+  wrapperClassName = "",
+  tableClassName = "",
+  headerClassName = "",
+  bodyClassName = "",
+  rowClassName = "",
+}) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-300">
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs sm:text-sm border-collapse min-w-[600px]">
-          <thead className="bg-gray-100">
-            <tr>
-              {columns.map((col, index) => (
-                <th
-                  key={index}
-                  className={`p-2 sm:p-4 text-left font-bold text-gray-700 border-x border-b border-gray-300 ${col.className || ""}`}
-                >
-                  {col.header}
-                </th>
-              ))}
-              {actions && (
-                <th className="p-2 sm:p-4 text-center font-bold text-gray-700 border-x border-b border-gray-300">
-                  Action
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {data && data.length > 0 ? (
-              data.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  {columns.map((col, colIndex) => (
-                    <td
-                      key={colIndex}
-                      className={`p-2 sm:p-4 border border-gray-200 text-gray-600 ${col.cellClassName || ""}`}
-                    >
-                      {col.render
-                        ? col.render(row, rowIndex)
-                        : row[col.accessor]}
-                    </td>
-                  ))}
-                  {actions && (
-                    <td className="p-2 sm:p-4 border border-gray-200">
-                      <div className="flex justify-center gap-1 sm:gap-2">
-                        {actions(row, rowIndex)}
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={columns.length + (actions ? 1 : 0)}
-                  className="p-6 sm:p-8 text-center text-gray-400 border border-gray-200 text-xs sm:text-sm"
-                >
-                  {emptyMessage}
-                </td>
-              </tr>
+    <div
+      className={`bg-white shadow-sm border border-gray-200 overflow-x-auto ${wrapperClassName}`}
+    >
+      <table
+        className={`min-w-full divide-y divide-gray-200 ${tableClassName}`}
+      >
+        <thead className={`bg-gray-100 whitespace-nowrap ${headerClassName}`}>
+          <tr>
+            {columns.map((col, index) => (
+              <th
+                key={index}
+                className={`px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider ${col.headerClassName || col.className || ""}`}
+              >
+                {col.header}
+              </th>
+            ))}
+            {actions && (
+              <th className="px-4 py-4 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider">
+                Actions
+              </th>
             )}
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        </thead>
+        <tbody
+          className={`bg-white divide-y divide-gray-200 whitespace-nowrap ${bodyClassName}`}
+        >
+          {data && data.length > 0 ? (
+            data.map((row, rowIndex) => (
+              <tr
+                key={row.id || row._id || rowIndex}
+                className={`transition-colors hover:bg-gray-50 ${rowClassName}`}
+              >
+                {columns.map((col, colIndex) => (
+                  <td
+                    key={colIndex}
+                    className={`px-4 py-4 text-sm font-medium text-slate-600 ${col.cellClassName || ""}`}
+                  >
+                    {col.render ? col.render(row, rowIndex) : row[col.accessor]}
+                  </td>
+                ))}
+                {actions && (
+                  <td className="px-4 py-4 text-sm">
+                    {actions(row, rowIndex)}
+                  </td>
+                )}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={columns.length + (actions ? 1 : 0)}
+                className="px-4 py-10 text-center text-gray-400 text-sm"
+              >
+                {emptyMessage}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
